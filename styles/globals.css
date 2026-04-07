@@ -1,0 +1,358 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* styles/globals.css — Humsafar Community v5.0 */
+/* ── FONTS ─────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+/* ── RESET & BASE ───────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background: #ffffff;
+  color: #0e1117;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+}
+
+/* SXO: Accessibility focus styles */
+:focus-visible {
+  outline: 3px solid #064e3b;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* SXO: Skip to main content for accessibility */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #064e3b;
+  color: white;
+  padding: 8px;
+  z-index: 100;
+  transition: top 0.2s;
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* ── CSS VARIABLES ──────────────────────────────────────────── */
+:root {
+  --green: #064e3b;
+  --green2: #0d6b52;
+  --emerald: #10b981;
+  --emerald-light: #6ee7b7;
+  --gold: #c8860a;
+  --amber: #fbbf24;
+  --ink: #0e1117;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --serif: 'Playfair Display', Georgia, serif;
+  --sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  --shadow: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+}
+
+/* ── TYPOGRAPHY ─────────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--serif);
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+p, li, span, label, input, textarea, button, a {
+  font-family: var(--sans);
+}
+
+/* ── SELECTION ──────────────────────────────────────────────── */
+::selection {
+  background: #d1fae5;
+  color: var(--green);
+}
+
+/* ── SCROLLBAR ──────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+/* ── ANIMATIONS ─────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+
+/* ── UTILITY CLASSES ────────────────────────────────────────── */
+.anim-up { animation: fadeUp 0.55s cubic-bezier(0.22, 0.68, 0, 1.2) both; }
+.anim-in { animation: fadeIn 0.35s ease both; }
+.anim-left { animation: slideLeft 0.5s ease both; }
+
+.d1 { animation-delay: 0.05s; }
+.d2 { animation-delay: 0.1s; }
+.d3 { animation-delay: 0.15s; }
+.d4 { animation-delay: 0.2s; }
+.d5 { animation-delay: 0.25s; }
+
+/* ── BLOG BODY STYLES ───────────────────────────────────────── */
+.blog-body {
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.85;
+  color: #1e293b;
+}
+
+.blog-body h2 {
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 40px 0 16px;
+  line-height: 1.2;
+}
+
+.blog-body h3 {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 28px 0 12px;
+}
+
+.blog-body p {
+  margin-bottom: 20px;
+}
+
+.blog-body blockquote {
+  border-left: 4px solid var(--emerald);
+  background: #f0fdf4;
+  padding: 18px 24px;
+  margin: 28px 0;
+  border-radius: 0 12px 12px 0;
+  font-style: italic;
+  color: #065f46;
+  font-size: 18px;
+}
+
+.blog-body ul, .blog-body ol {
+  margin: 0 0 20px 22px;
+}
+
+.blog-body li {
+  margin-bottom: 8px;
+  line-height: 1.75;
+}
+
+.blog-body img {
+  width: 100%;
+  border-radius: 16px;
+  margin: 28px 0 8px;
+  display: block;
+}
+
+.blog-body figcaption, .blog-body .cap {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  font-style: italic;
+  margin-bottom: 24px;
+}
+
+.blog-body hr {
+  border: none;
+  border-top: 2px dashed var(--border);
+  margin: 36px 0;
+}
+
+/* ── FAQ STYLES ─────────────────────────────────────────────── */
+.faq-item {
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  transition: box-shadow 0.15s;
+}
+
+.faq-item:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.faq-question {
+  cursor: pointer;
+  padding: 18px 22px;
+  font-weight: 600;
+  font-size: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  width: 100%;
+  border: none;
+  text-align: left;
+  font-family: var(--sans);
+  color: #1e293b;
+  transition: background 0.15s;
+}
+
+.faq-question:hover {
+  background: var(--bg);
+}
+
+.faq-answer {
+  padding: 4px 22px 18px;
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.75;
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .sidebar { display: none; }
+  .main-content { grid-template-columns: 1fr !important; }
+}
+
+@media (max-width: 768px) {
+  .desktop-only { display: none !important; }
+  .mobile-hidden { display: none !important; }
+  
+  /* Mobile booking bar */
+  .mobile-book-bar {
+    display: flex !important;
+  }
+  
+  /* Adjust padding on mobile */
+  .section-padding {
+    padding: 40px 16px !important;
+  }
+  
+  /* Full width grids on mobile */
+  .grid-auto {
+    grid-template-columns: 1fr !important;
+  }
+
+  .hero-title {
+    font-size: clamp(36px, 10vw, 70px) !important;
+  }
+}
+
+/* SXO: Hide mobile book bar on desktop */
+.mobile-book-bar {
+  display: none;
+}
+
+/* ── PRINT STYLES (SEO: Printable content) ──────────────────── */
+@media print {
+  .mobile-book-bar,
+  nav,
+  .whatsapp-float,
+  .newsletter-section {
+    display: none !important;
+  }
+  
+  body {
+    font-size: 12pt;
+    color: black;
+  }
+  
+  a {
+    color: black;
+    text-decoration: underline;
+  }
+}
+
+/* ── PREFERS REDUCED MOTION (SXO: Accessibility) ────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── HIGH CONTRAST MODE ─────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  /* Add dark mode support here if needed */
+}
+
+/* ── LINK STYLES ────────────────────────────────────────────── */
+a {
+  color: var(--green);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ── FORM ELEMENTS ──────────────────────────────────────────── */
+input, textarea, select {
+  font-family: var(--sans) !important;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--green) !important;
+  box-shadow: 0 0 0 3px rgba(6, 78, 59, 0.08);
+}
+
+/* ── LOADING SKELETON (SXO: Perceived performance) ──────────── */
+.skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+/* ── IMAGE OPTIMIZATION (SXO: CLS prevention) ───────────────── */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Prevent CLS on images with known dimensions */
+img[width][height] {
+  height: auto;
+}
