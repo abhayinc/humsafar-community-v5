@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { kv } from '@vercel/kv';
+import defaultData from '../../data/data.json';
 
 export default async function handler(req, res) {
   // Simple password check using Authorization header
@@ -16,15 +17,26 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     try {
       // 1. Read from KV first
-      const kvData = await kv.get('humsafar_cms_data');
-      if (kvData && kvData.SITE) {
-        return res.status(200).json(kvData);
+      try {
+        const kvData = await kv.get('humsafar_cms_data');
+        if (kvData && kvData.SITE) {
+          return res.status(200).json(kvData);
+        }
+      } catch (kvErr) {
+        console.error("KV read failed:", kvErr.message);
+        // Continue to fallback
       }
       
       // 2. Fallback to local Dev file
-      const fileData = await fs.readFile(dataFilePath, 'utf8');
-      res.status(200).json(JSON.parse(fileData));
+      try {
+        const fileData = await fs.readFile(dataFilePath, 'utf8');
+        return res.status(200).json(JSON.parse(fileData));
+      } catch (fsErr) {
+        // 3. Ultimate fallback to static package data (Vercel deployment where filesystem lacks the file and KV is empty)
+        return res.status(200).json(defaultData);
+      }
     } catch (error) {
+      console.error(error);
       res.status(500).json({ error: 'Failed to read data' });
     }
   } else if (req.method === 'PUT' || req.method === 'POST') {

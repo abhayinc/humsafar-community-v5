@@ -40,13 +40,14 @@ export default function AdminDashboard() {
         setIsAuthenticated(true);
         localStorage.setItem('humsafar_admin_auth', pass);
       } else {
-        if (isAuthenticated) showToast("Session expired. Please login again.");
+        showToast(isAuthenticated ? "Session expired. Please login again." : "❌ Incorrect password or server error.");
         setIsAuthenticated(false);
         localStorage.removeItem('humsafar_admin_auth');
       }
     } catch (err) {
       console.error(err);
       if (isAuthenticated) showToast("Error connecting to server.");
+      else showToast("❌ Cannot connect to API.");
     }
     setLoading(false);
   };
