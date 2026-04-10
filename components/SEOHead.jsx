@@ -17,11 +17,13 @@ export default function SEOHead({
   updatedAt,
   author,
   breadcrumbs,
+  site: freshSite,
 }) {
-  const fullTitle = title ? `${title} | ${SITE.name}` : `${SITE.name} — India's #1 Travel Community`;
-  const fullUrl = url ? `${SITE.url}${url}` : SITE.url;
-  const ogImage = image || SITE.defaultOGImage;
-  const canonicalUrl = canonical ? `${SITE.url}${canonical}` : fullUrl;
+  const site = freshSite || SITE;
+  const fullTitle = title ? `${title} | ${site.name}` : `${site.name} — India's #1 Travel Community`;
+  const fullUrl = url ? `${site.url}${url}` : site.url;
+  const ogImage = image || site.defaultOGImage;
+  const canonicalUrl = canonical ? `${site.url}${canonical}` : fullUrl;
 
   return (
     <Head>
@@ -29,7 +31,7 @@ export default function SEOHead({
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
       {keywords && <meta name="keywords" content={keywords} />}
-      <meta name="author" content={author || SITE.name} />
+      <meta name="author" content={author || site.name} />
       <link rel="canonical" href={canonicalUrl} />
 
       {/* ── ROBOTS (SEO + GEO: Allow AI crawlers) ─────────────────── */}
@@ -60,7 +62,7 @@ export default function SEOHead({
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta property="og:image:alt" content={title} />
-      <meta property="og:site_name" content={SITE.name} />
+      <meta property="og:site_name" content={site.name} />
       <meta property="og:locale" content="en_IN" />
 
       {/* ── TWITTER CARDS ─────────────────────────────────────────── */}
@@ -75,16 +77,16 @@ export default function SEOHead({
         <>
           <meta property="article:published_time" content={publishedAt} />
           <meta property="article:modified_time" content={updatedAt || publishedAt} />
-          <meta property="article:author" content={author || SITE.name} />
-          <meta property="article:publisher" content={SITE.socials?.facebook} />
+          <meta property="article:author" content={author || site.name} />
+          <meta property="article:publisher" content={site.socials?.facebook} />
         </>
       )}
 
       {/* ── GEOGRAPHIC META (Local SEO) ────────────────────────────── */}
       <meta name="geo.region" content="IN-HR" />
       <meta name="geo.placename" content="Gurugram, Haryana, India" />
-      <meta name="geo.position" content={`${SITE.lat};${SITE.lng}`} />
-      <meta name="ICBM" content={`${SITE.lat}, ${SITE.lng}`} />
+      <meta name="geo.position" content={`${site.lat};${site.lng}`} />
+      <meta name="ICBM" content={`${site.lat}, ${site.lng}`} />
 
       {/* ── LANGUAGE & CONTENT TYPE ────────────────────────────────── */}
       <meta httpEquiv="content-language" content="en-in" />
@@ -136,7 +138,7 @@ export default function SEOHead({
                 "@type": "ListItem",
                 position: i + 1,
                 name: item.name,
-                item: `${SITE.url}${item.path}`,
+                item: `${site.url}${item.path}`,
               })),
             }),
           }}

@@ -5,13 +5,14 @@ import { useRouter } from "next/router";
 import SEOHead from "../../components/SEOHead";
 import {
   SITE,
-  BLOGS,
+  getFreshData,
   generateArticleSchema,
   generateOrganizationSchema,
   generateFAQSchema,
 } from "../../data";
 
-export default function BlogDetailPage({ blog, relatedBlogs }) {
+export default function BlogDetailPage({ blog, relatedBlogs, site: freshSite }) {
+  const dynamicSite = freshSite || SITE || { name: "Humsafar Community", whatsapp: "916268496389" };
   const router = useRouter();
   const [expandedFaq, setExpandedFaq] = useState(null);
 
@@ -21,9 +22,9 @@ export default function BlogDetailPage({ blog, relatedBlogs }) {
   if (!blog) return null;
 
   const schemas = [
-    generateOrganizationSchema(),
-    generateArticleSchema(blog),
-    ...(blog.faqs?.length > 0 ? [generateFAQSchema(blog.faqs)] : []),
+    generateOrganizationSchema(dynamicSite),
+    generateArticleSchema(blog, dynamicSite),
+    ...(blog.faqs?.length > 0 ? [generateFAQSchema(blog.faqs, dynamicSite)] : []),
   ];
 
   const breadcrumbs = [
@@ -46,6 +47,7 @@ export default function BlogDetailPage({ blog, relatedBlogs }) {
         author={blog.author}
         schemas={schemas}
         breadcrumbs={breadcrumbs}
+        site={dynamicSite}
       />
 
       {/* Breadcrumb nav */}
@@ -186,7 +188,7 @@ export default function BlogDetailPage({ blog, relatedBlogs }) {
                 Frequently Asked Questions
               </h2>
               <p style={{ fontSize: 13, color: "#94a3b8", marginBottom: 24 }}>
-                Answered by our travel experts at {SITE.name}
+                Answered by our travel experts at {dynamicSite.name}
               </p>
               {blog.faqs.map((faq, i) => (
                 <div
@@ -228,7 +230,7 @@ export default function BlogDetailPage({ blog, relatedBlogs }) {
               Talk to our experts and book the perfect trip today.
             </p>
             <a
-              href={`https://wa.me/${SITE.whatsapp}?text=Hi Humsafar! I read your blog about ${blog.title} and want to book a trip.`}
+              href={`https://wa.me/${dynamicSite.whatsapp}?text=Hi Humsafar! I read your blog about ${blog.title} and want to book a trip.`}
               target="_blank"
               rel="noopener noreferrer"
               style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#22c55e", color: "#fff", padding: "14px 28px", borderRadius: 14, fontWeight: 700, fontSize: 15, textDecoration: "none", fontFamily: "Plus Jakarta Sans, sans-serif" }}
@@ -269,22 +271,24 @@ export default function BlogDetailPage({ blog, relatedBlogs }) {
 }
 
 export async function getStaticPaths() {
-  const paths = BLOGS.map((blog) => ({
+  const data = await getFreshData();
+  const paths = data.BLOGS.map((blog) => ({
     params: { slug: blog.slug },
   }));
   return { paths, fallback: true };
 }
 
 export async function getStaticProps({ params }) {
-  const blog = BLOGS.find((b) => b.slug === params.slug);
+  const data = await getFreshData();
+  const blog = data.BLOGS.find((b) => b.slug === params.slug);
   if (!blog) return { notFound: true };
 
-  const relatedBlogs = BLOGS.filter(
+  const relatedBlogs = data.BLOGS.filter(
     (b) => b.id !== blog.id && b.category === blog.category
   ).slice(0, 3);
 
   return {
-    props: { blog, relatedBlogs },
+    props: { blog, relatedBlogs, site: data.SITE },
     revalidate: 60,
   };
 }

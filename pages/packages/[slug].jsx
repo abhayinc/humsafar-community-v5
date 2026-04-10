@@ -7,14 +7,15 @@ import { useRouter } from "next/router";
 import SEOHead from "../../components/SEOHead";
 import {
   SITE,
-  TOURS,
+  getFreshData,
   generateTourSchema,
   generateOrganizationSchema,
   generateBreadcrumbSchema,
   generateFAQSchema,
 } from "../../data";
 
-export default function TourDetailPage({ tour, relatedTours }) {
+export default function TourDetailPage({ tour, relatedTours, site: freshSite }) {
+  const dynamicSite = freshSite || SITE || { whatsapp: "916268496389", name: "Humsafar Community" };
   const router = useRouter();
   const [activeDate, setActiveDate] = useState(null);
   const [pax, setPax] = useState(1);
@@ -51,9 +52,9 @@ export default function TourDetailPage({ tour, relatedTours }) {
   const waMessage = `Hi Humsafar! I am interested in *${tour.title}*.\n\n🗓 Date: ${activeDate ? new Date(activeDate).toDateString() : "TBD"}\n🏨 Sharing: ${sharing}\n👥 People: ${pax}\n💰 Total: ₹${totalPrice.toLocaleString("en-IN")}\n⏱ Duration: ${tour.duration}\n\nPlease share more details.`;
 
   const schemas = [
-    generateOrganizationSchema(),
-    generateTourSchema(tour),
-    ...(tour.faqs?.length > 0 ? [generateFAQSchema(tour.faqs)] : []),
+    generateOrganizationSchema(dynamicSite),
+    generateTourSchema(tour, dynamicSite),
+    ...(tour.faqs?.length > 0 ? [generateFAQSchema(tour.faqs, dynamicSite)] : []),
   ];
 
   const breadcrumbs = [
@@ -73,6 +74,7 @@ export default function TourDetailPage({ tour, relatedTours }) {
         type="product"
         schemas={schemas}
         breadcrumbs={breadcrumbs}
+        site={dynamicSite}
       />
 
       {/* Schema breadcrumb display */}
@@ -145,7 +147,7 @@ export default function TourDetailPage({ tour, relatedTours }) {
           </div>
         </div>
         <a
-          href={`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(waMessage)}`}
+          href={`https://wa.me/${dynamicSite.whatsapp}?text=${encodeURIComponent(waMessage)}`}
           target="_blank"
           rel="noopener noreferrer"
           style={{
@@ -403,7 +405,7 @@ export default function TourDetailPage({ tour, relatedTours }) {
                 </div>
 
                 <a
-                  href={`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(waMessage)}`}
+                  href={`https://wa.me/${dynamicSite.whatsapp}?text=${encodeURIComponent(waMessage)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", background: "#22c55e", color: "#fff", padding: "15px", borderRadius: 14, fontWeight: 800, fontSize: 14, textDecoration: "none", boxSizing: "border-box", fontFamily: "Plus Jakarta Sans, sans-serif" }}
@@ -459,22 +461,24 @@ function getNextSaturdays(n = 5) {
 
 // SSG with ISR for maximum SEO performance
 export async function getStaticPaths() {
-  const paths = TOURS.map((tour) => ({
+  const data = await getFreshData();
+  const paths = data.TOURS.map((tour) => ({
     params: { slug: tour.slug },
   }));
   return { paths, fallback: true };
 }
 
 export async function getStaticProps({ params }) {
-  const tour = TOURS.find((t) => t.slug === params.slug);
+  const data = await getFreshData();
+  const tour = data.TOURS.find((t) => t.slug === params.slug);
   if (!tour) return { notFound: true };
 
-  const relatedTours = TOURS.filter(
+  const relatedTours = data.TOURS.filter(
     (t) => t._id !== tour._id && t.region === tour.region
   ).slice(0, 3);
 
   return {
-    props: { tour, relatedTours },
+    props: { tour, relatedTours, site: data.SITE },
     revalidate: 60, // ISR: Update every 60s (SXO: Fresh content)
   };
 }

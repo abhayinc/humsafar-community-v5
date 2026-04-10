@@ -6,9 +6,7 @@ import { useRouter } from "next/router";
 import SEOHead from "../components/SEOHead";
 import {
   SITE,
-  TOURS,
-  BLOGS,
-  BANNERS,
+  getFreshData,
   generateOrganizationSchema,
   generateWebsiteSchema,
   generateFAQSchema,
@@ -17,7 +15,9 @@ import {
 // ──────────────────────────────────────────────────────────────────
 // HOMEPAGE COMPONENT
 // ──────────────────────────────────────────────────────────────────
-export default function HomePage({ tours, blogs, banners }) {
+
+export default function HomePage({ tours, blogs, banners, site: freshSite }) {
+  const dynamicSite = freshSite || SITE || { name: "Humsafar Community", socials: {} };
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -79,9 +79,9 @@ export default function HomePage({ tours, blogs, banners }) {
 
   // Schema.org structured data for homepage (GEO + AIO)
   const schemas = [
-    generateOrganizationSchema(),
-    generateWebsiteSchema(),
-    generateFAQSchema(homepageFAQs),
+    generateOrganizationSchema(dynamicSite),
+    generateWebsiteSchema(dynamicSite),
+    generateFAQSchema(homepageFAQs, dynamicSite),
     // ItemList schema for tours (helps AI systems understand your offerings)
     {
       "@context": "https://schema.org",
@@ -94,7 +94,7 @@ export default function HomePage({ tours, blogs, banners }) {
         "@type": "ListItem",
         position: i + 1,
         name: tour.title,
-        url: `${SITE.url}/packages/${tour.slug}/`,
+        url: `${dynamicSite.url}/packages/${tour.slug}/`,
         description: tour.seoDesc,
       })),
     },
@@ -122,12 +122,13 @@ export default function HomePage({ tours, blogs, banners }) {
       {/* ── SEO HEAD ─────────────────────────────────────────────── */}
       <SEOHead
         title="Best Tour Packages India 2025 | Group Tours & Himalayan Treks"
-        description={`Book group tours, custom trips & Himalayan treks with ${SITE.name}. Manali ₹6,999 | Kedarnath ₹10,500 | Jaisalmer ₹7,500. Fixed Saturday departures from Delhi. 4.8⭐ rated by 2,847+ travelers.`}
+        description={`Book group tours, custom trips & Himalayan treks with ${dynamicSite.name}. Manali ₹6,999 | Kedarnath ₹10,500 | Jaisalmer ₹7,500. Fixed Saturday departures from Delhi. 4.8⭐ rated by 2,847+ travelers.`}
         keywords="group tours india 2025, manali tour package from delhi, kedarnath yatra package, jaisalmer desert safari, himalayan trek packages, corporate team outing, custom trip planning india, travel community india"
-        image={SITE.defaultOGImage}
+        image={dynamicSite.defaultOGImage}
         url="/"
         schemas={schemas}
         breadcrumbs={[{ name: "Home", path: "/" }]}
+        site={dynamicSite}
       />
 
       {/* ── NAVIGATION ───────────────────────────────────────────── */}
@@ -216,7 +217,7 @@ export default function HomePage({ tours, blogs, banners }) {
               </Link>
             ))}
             <a
-              href={`https://wa.me/${SITE.whatsapp}`}
+              href={`https://wa.me/${dynamicSite.whatsapp}`}
               target="_blank"
               rel="noopener noreferrer"
               style={{
@@ -946,7 +947,7 @@ export default function HomePage({ tours, blogs, banners }) {
       </main>
 
       {/* ── FOOTER ───────────────────────────────────────────────── */}
-      <Footer />
+      <Footer dynamicSite={dynamicSite} />
 
       {/* ── WHATSAPP FLOAT ───────────────────────────────────────── */}
       <a
@@ -1368,7 +1369,7 @@ function FAQAccordion({ faqs }) {
 // ──────────────────────────────────────────────────────────────────
 // FOOTER COMPONENT
 // ──────────────────────────────────────────────────────────────────
-function Footer() {
+function Footer({ dynamicSite }) {
   return (
     <footer
       style={{
@@ -1542,7 +1543,7 @@ function Footer() {
               Connect
             </h3>
             <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
-              {Object.entries(SITE.socials).map(([platform, url]) => (
+              {Object.entries(dynamicSite.socials || {}).map(([platform, url]) => (
                 <a
                   key={platform}
                   href={url}
@@ -1565,10 +1566,10 @@ function Footer() {
                   {platform === "instagram"
                     ? "📸"
                     : platform === "facebook"
-                    ? "👥"
-                    : platform === "youtube"
-                    ? "▶️"
-                    : "🐦"}
+                      ? "👥"
+                      : platform === "youtube"
+                        ? "▶️"
+                        : "🐦"}
                 </a>
               ))}
             </div>
@@ -1582,7 +1583,7 @@ function Footer() {
                 lineHeight: 1.8,
               }}
             >
-              <div>✅ GST Registered: 06AABCH1234F1Z5</div>
+              <div>✅ GST Registered: {dynamicSite.gst}</div>
               <div>✅ MSME Certified</div>
               <div>✅ 4.8⭐ Google Rated</div>
               <div>✅ 50,000+ Travelers Served</div>
@@ -1603,10 +1604,10 @@ function Footer() {
           }}
         >
           <span>
-            © {new Date().getFullYear()} Humsafar Tours and Travels Pvt. Ltd.
+            © {new Date().getFullYear()} {dynamicSite.name} Pvt. Ltd.
             All rights reserved.
           </span>
-          <span>Made with ❤️ in India · Gurugram, Haryana</span>
+          <span>Made with ❤️ in India · {dynamicSite.location}</span>
         </div>
       </div>
     </footer>
@@ -1618,12 +1619,13 @@ function Footer() {
 // is rendered server-side for Google crawl bots)
 // ──────────────────────────────────────────────────────────────────
 export async function getStaticProps() {
-  // In production: replace with Sanity/CMS fetch
+  const data = await getFreshData();
   return {
     props: {
-      tours: TOURS,
-      blogs: BLOGS,
-      banners: BANNERS,
+      tours: data.TOURS,
+      blogs: data.BLOGS,
+      banners: data.BANNERS,
+      site: data.SITE,
     },
     // ISR: Revalidate every 60 seconds (SXO: Always fresh content)
     revalidate: 60,

@@ -5,30 +5,63 @@
 
 import data from './data.json';
 
+// Static exports (cached by Webpack)
 export const SITE = data.SITE;
 export const TOURS = data.TOURS;
 export const BLOGS = data.BLOGS;
 export const BANNERS = data.BANNERS;
 
-export function generateOrganizationSchema() {
+/**
+ * Server-side only: Reads fresh data directly from disk to bypass Webpack cache.
+ * Use this in getStaticProps/getServerSideProps.
+ */
+export async function getFreshData() {
+  if (typeof window === 'undefined') {
+    // 1. Try fetching from Vercel KV if available (for production)
+    try {
+      const { kv } = require('@vercel/kv');
+      const kvData = await kv.get('humsafar_cms_data');
+      if (kvData && kvData.SITE) {
+        return kvData;
+      }
+    } catch (e) {
+      console.error("Vercel KV fetch failed (or not configured).", e.message || e);
+    }
+
+    // 2. Fallback to local files (for local dev)
+    const fs = require('fs');
+    const path = require('path');
+    try {
+      const filePath = path.join(process.cwd(), 'data', 'data.json');
+      const fileData = fs.readFileSync(filePath, 'utf8');
+      return JSON.parse(fileData);
+    } catch (e) {
+      console.error("Failed to read fresh local data, falling back to static import", e);
+      return data;
+    }
+  }
+  return data;
+}
+
+export function generateOrganizationSchema(site = SITE) {
   return {
     "@context": "https://schema.org",
     "@type": ["TravelAgency", "LocalBusiness"],
-    "@id": `${SITE.url}/#organization`,
-    name: SITE.name,
+    "@id": `${site.url}/#organization`,
+    name: site.name,
     alternateName: ["Humsafar", "Humsafar Travels", "Humsafar Tours"],
-    url: SITE.url,
+    url: site.url,
     logo: {
       "@type": "ImageObject",
-      url: `${SITE.url}/logo.png`,
+      url: `${site.url}/logo.png`,
       width: 200,
       height: 60,
     },
     description:
       "India's most trusted travel community. Award-winning group tours, custom Himalayan expeditions, and corporate retreats. Serving 50,000+ travelers since 2020.",
-    telephone: SITE.phone,
-    email: SITE.email,
-    foundingDate: SITE.founded,
+    telephone: site.phone,
+    email: site.email,
+    foundingDate: site.founded,
     address: {
       "@type": "PostalAddress",
       streetAddress: "4th Floor, Adventure Hub, Sector 15",
@@ -39,8 +72,8 @@ export function generateOrganizationSchema() {
     },
     geo: {
       "@type": "GeoCoordinates",
-      latitude: SITE.lat,
-      longitude: SITE.lng,
+      latitude: site.lat,
+      longitude: site.lng,
     },
     openingHoursSpecification: [
       {
@@ -59,24 +92,24 @@ export function generateOrganizationSchema() {
     priceRange: "₹₹",
     aggregateRating: {
       "@type": "AggregateRating",
-      ratingValue: SITE.ratingValue,
-      reviewCount: SITE.reviewCount,
+      ratingValue: site.ratingValue,
+      reviewCount: site.reviewCount,
       bestRating: "5",
       worstRating: "1",
     },
-    sameAs: Object.values(SITE.socials),
+    sameAs: Object.values(site.socials),
   };
 }
 
-export function generateTourSchema(tour) {
+export function generateTourSchema(tour, site = SITE) {
   return {
     "@context": "https://schema.org",
     "@type": "TouristTrip",
-    "@id": `${SITE.url}/packages/${tour.slug}/`,
+    "@id": `${site.url}/packages/${tour.slug}/`,
     name: tour.title,
     description: tour.seoDesc,
     image: tour.img,
-    url: `${SITE.url}/packages/${tour.slug}/`,
+    url: `${site.url}/packages/${tour.slug}/`,
     offers: {
       "@type": "Offer",
       price: tour.price,
@@ -85,8 +118,8 @@ export function generateTourSchema(tour) {
       validFrom: new Date().toISOString().split("T")[0],
       seller: {
         "@type": "TravelAgency",
-        name: SITE.name,
-        url: SITE.url,
+        name: site.name,
+        url: site.url,
       },
     },
     aggregateRating: {
@@ -97,8 +130,8 @@ export function generateTourSchema(tour) {
     },
     provider: {
       "@type": "TravelAgency",
-      "@id": `${SITE.url}/#organization`,
-      name: SITE.name,
+      "@id": `${site.url}/#organization`,
+      name: site.name,
     },
     itinerary: tour.itinerary?.map((day) => ({
       "@type": "TouristAttraction",
@@ -117,11 +150,11 @@ export function generateTourSchema(tour) {
   };
 }
 
-export function generateArticleSchema(blog) {
+export function generateArticleSchema(blog, site = SITE) {
   return {
     "@context": "https://schema.org",
     "@type": "Article",
-    "@id": `${SITE.url}/blog/${blog.slug}/`,
+    "@id": `${site.url}/blog/${blog.slug}/`,
     headline: blog.seoTitle || blog.title,
     description: blog.seoDesc || blog.excerpt,
     image: {
@@ -134,17 +167,17 @@ export function generateArticleSchema(blog) {
     dateModified: blog.updatedAt || blog.publishedAt,
     author: {
       "@type": "Organization",
-      name: SITE.name,
-      url: SITE.url,
+      name: site.name,
+      url: site.url,
     },
     publisher: {
       "@type": "Organization",
-      name: SITE.name,
-      logo: { "@type": "ImageObject", url: `${SITE.url}/logo.png` },
+      name: site.name,
+      logo: { "@type": "ImageObject", url: `${site.url}/logo.png` },
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${SITE.url}/blog/${blog.slug}/`,
+      "@id": `${site.url}/blog/${blog.slug}/`,
     },
     keywords: blog.keywords,
     articleSection: blog.category,
@@ -162,7 +195,7 @@ export function generateArticleSchema(blog) {
   };
 }
 
-export function generateFAQSchema(faqs) {
+export function generateFAQSchema(faqs, site = SITE) {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -172,13 +205,13 @@ export function generateFAQSchema(faqs) {
       acceptedAnswer: {
         "@type": "Answer",
         text: f.a,
-        author: { "@type": "Organization", name: SITE.name },
+        author: { "@type": "Organization", name: site.name },
       },
     })),
   };
 }
 
-export function generateBreadcrumbSchema(items) {
+export function generateBreadcrumbSchema(items, site = SITE) {
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -186,18 +219,18 @@ export function generateBreadcrumbSchema(items) {
       "@type": "ListItem",
       position: i + 1,
       name: item.name,
-      item: `${SITE.url}${item.path}`,
+      item: `${site.url}${item.path}`,
     })),
   };
 }
 
-export function generateWebsiteSchema() {
+export function generateWebsiteSchema(site = SITE) {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "@id": `${SITE.url}/#website`,
-    url: SITE.url,
-    name: SITE.name,
+    "@id": `${site.url}/#website`,
+    url: site.url,
+    name: site.name,
     description:
       "India's #1 travel community for group tours, Himalayan treks, and custom trips",
     inLanguage: "en-IN",
@@ -205,13 +238,13 @@ export function generateWebsiteSchema() {
       "@type": "SearchAction",
       target: {
         "@type": "EntryPoint",
-        urlTemplate: `${SITE.url}/search?q={search_term_string}`,
+        urlTemplate: `${site.url}/search?q={search_term_string}`,
       },
       "query-input": "required name=search_term_string",
     },
     publisher: {
       "@type": "Organization",
-      "@id": `${SITE.url}/#organization`,
+      "@id": `${site.url}/#organization`,
     },
   };
 }

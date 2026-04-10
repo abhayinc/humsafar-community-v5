@@ -12,6 +12,8 @@
     "reviewCount": "2847",
     "ratingValue": "4.8",
     "totalTravelers": "50000",
+    "gst": "06AABCH1234F1Z5",
+    "location": "Gurugram, Haryana",
     "socials": {
       "instagram": "https://instagram.com/humsafarcommunity",
       "facebook": "https://facebook.com/humsafarcommunity",
@@ -29,7 +31,7 @@
       "region": "himachal",
       "type": "group",
       "duration": "6 Days / 5 Nights",
-      "price": 999,
+      "price": 9995,
       "oldPrice": "9,500",
       "img": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=1200",
       "rating": 4.8,
@@ -136,7 +138,7 @@
       "type": "group",
       "duration": "5 Days / 4 Nights",
       "price": 10500,
-      "oldPrice": "14,000",
+      "oldPrice": "100",
       "img": "https://images.unsplash.com/photo-1562016600-ece13e8ba570?q=80&w=1200",
       "rating": 5,
       "reviews": 189,
@@ -426,6 +428,13 @@
       "id": "blog1775560014946",
       "title": "New Blog Post",
       "slug": "new-blog-1775560014946",
+      "content": [],
+      "coverImage": ""
+    },
+    {
+      "id": "blog1775562066591",
+      "title": "New Blog Postwedw",
+      "slug": "new-blog-1775562066591",
       "content": [],
       "coverImage": ""
     }

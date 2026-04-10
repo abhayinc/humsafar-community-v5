@@ -44,7 +44,9 @@ const nextConfig = {
           },
           {
             key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
+            value: process.env.NODE_ENV === "production" 
+              ? "public, max-age=31536000, immutable"
+              : "no-store, max-age=0",
           },
         ],
       },
@@ -87,13 +89,19 @@ const nextConfig = {
     ];
   },
 
-  // ── SEO: Compiler options ──
+  // ── SXO: Compiler options ──
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
 
-  // ── NOTE: experimental.optimizeCss removed (requires 'critters' peer dep)
-  // ── NOTE: experimental.scrollRestoration removed (dropped in Next.js 13+)
+  // ── FIX: Prevent HMR loop on data.json ──
+  webpack: (config) => {
+    config.watchOptions = {
+      ...(config.watchOptions || {}),
+      ignored: ["**/node_modules/**", "**/data/data.json"],
+    };
+    return config;
+  },
 };
 
 module.exports = nextConfig;
