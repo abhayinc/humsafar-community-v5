@@ -47,9 +47,9 @@ export async function getFreshData() {
 
     // Merge logic: Use Sanity data if it exists, otherwise use staticData
     // Ensure TOURS and BLOGS are arrays and only contain items with string slugs
-    const tours = (sanityData.TOURS || []).filter(t => typeof t.slug === 'string');
-    const blogs = (sanityData.BLOGS || []).filter(b => typeof b.slug === 'string');
-    const banners = (sanityData.BANNERS || []).filter(bn => bn.url);
+    const tours = (sanityData.TOURS || []);
+    const blogs = (sanityData.BLOGS || []);
+    const banners = (sanityData.BANNERS || []);
 
     return {
       SITE: sanityData.SITE || staticData.SITE,
