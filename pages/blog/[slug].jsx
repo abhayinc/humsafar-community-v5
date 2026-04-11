@@ -1,6 +1,7 @@
 // pages/blog/[slug].jsx — Blog detail with full SEO/AEO/GEO/AIO
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import SEOHead from "../../components/SEOHead";
 import {
@@ -115,13 +116,17 @@ export default function BlogDetailPage({ blog, relatedBlogs, site: freshSite }) 
 
           {/* Cover image */}
           {blog.coverImage && (
-            <img
-              src={blog.coverImage}
-              alt={blog.title}
-              style={{ width: "100%", borderRadius: 20, marginBottom: 36, maxHeight: 440, objectFit: "cover", display: "block" }}
-              itemProp="image"
-              fetchpriority="high"
-            />
+            <div style={{ position: 'relative', height: 440, width: '100%', marginBottom: 36 }}>
+              <Image
+                src={blog.coverImage}
+                alt={blog.title}
+                fill
+                priority
+                sizes="(max-width: 800px) 100vw, 800px"
+                style={{ borderRadius: 20, objectFit: "cover" }}
+                itemProp="image"
+              />
+            </div>
           )}
 
           {/* Blog body */}

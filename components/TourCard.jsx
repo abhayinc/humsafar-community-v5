@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function TourCard({ tour }) {
   if (!tour) return null;
@@ -26,16 +27,12 @@ export default function TourCard({ tour }) {
       itemType="https://schema.org/TouristTrip"
     >
       <div style={{ position: "relative", paddingTop: "64%", overflow: "hidden" }}>
-        <img
+        <Image
           src={tour.img}
           alt={`${tour.title} — ${tour.location}`}
-          loading="lazy"
-          decoding="async"
+          fill
+          sizes="(max-width: 768px) 100vw, 33vw"
           style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
             objectFit: "cover",
           }}
           itemProp="image"

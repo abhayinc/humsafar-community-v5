@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import SEOHead from "../../components/SEOHead";
 import {
@@ -171,11 +172,13 @@ export default function TourDetailPage({ tour, relatedTours, site: freshSite }) 
 
       {/* Hero Image */}
       <div style={{ position: "relative", height: "56vh", overflow: "hidden" }}>
-        <img
+        <Image
           src={tour.img}
           alt={`${tour.title} — ${tour.location}`}
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          fetchpriority="high"
+          fill
+          priority
+          sizes="100vw"
+          style={{ objectFit: "cover" }}
         />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,0.82),rgba(0,0,0,0.18))" }} />
         <Link href="/packages" style={{ position: "absolute", top: 88, left: 24, background: "rgba(255,255,255,0.18)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", borderRadius: 999, padding: "9px 20px", cursor: "pointer", fontSize: 13, fontWeight: 600, fontFamily: "Plus Jakarta Sans, sans-serif", textDecoration: "none" }}>

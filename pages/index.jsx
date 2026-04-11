@@ -285,13 +285,13 @@ export default function HomePage({ tours, blogs, banners, site: freshSite }) {
               zIndex: i === currentSlide ? 1 : 0,
             }}
           >
-            <img
+            <Image
               src={b.url}
-              alt={b.tag}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              // SXO: Only load visible image eagerly
-              loading={i === 0 ? "eager" : "lazy"}
-              fetchpriority={i === 0 ? "high" : "auto"}
+              alt={b.tag || "Travel Destination"}
+              fill
+              priority={i === 0}
+              sizes="100vw"
+              style={{ objectFit: "cover" }}
             />
           </div>
         ))}

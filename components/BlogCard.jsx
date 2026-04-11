@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function BlogCard({ blog }) {
   if (!blog) return null;
@@ -25,14 +26,16 @@ export default function BlogCard({ blog }) {
       itemType="https://schema.org/BlogPosting"
     >
       {blog.coverImage && (
-        <img
-          src={blog.coverImage}
-          alt={blog.title}
-          loading="lazy"
-          decoding="async"
-          style={{ width: "100%", height: 196, objectFit: "cover", display: "block" }}
-          itemProp="image"
-        />
+        <div style={{ position: 'relative', height: 196, width: '100%' }}>
+          <Image
+            src={blog.coverImage}
+            alt={blog.title}
+            fill
+            sizes="(max-width: 768px) 100vw, 33vw"
+            style={{ objectFit: "cover" }}
+            itemProp="image"
+          />
+        </div>
       )}
       <div style={{ padding: "20px" }}>
         <div style={{ display: "flex", gap: 8, marginBottom: 11 }}>

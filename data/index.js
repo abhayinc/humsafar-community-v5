@@ -17,6 +17,7 @@ export const BANNERS = data.BANNERS;
  */
 import { createClient } from 'next-sanity';
 import staticData from './data.json';
+import { urlFor } from '../lib/sanity.image';
 
 const client = createClient({
   projectId: 'fghdctku',
@@ -32,24 +33,39 @@ export async function getFreshData() {
       "TOURS": *[_type == "tour" && defined(slug.current)] {
         ...,
         "slug": slug.current,
-        "img": img.asset->url
+        "img": img // Get full object for builder
       },
       "BLOGS": *[_type == "blog" && defined(slug.current)] {
         ...,
         "slug": slug.current,
-        "coverImage": coverImage.asset->url
+        "coverImage": coverImage // Get full object for builder
       },
       "BANNERS": *[_type == "banner"] {
         ...,
-        "url": image.asset->url
+        "url": image // Get full object for builder
       }
     }`);
 
     // Merge logic: Use Sanity data if it exists, otherwise use staticData
     // Ensure TOURS and BLOGS are arrays and only contain items with string slugs
-    const tours = (sanityData.TOURS || []);
-    const blogs = (sanityData.BLOGS || []);
-    const banners = (sanityData.BANNERS || []);
+    const tours = (sanityData.TOURS || []).map(t => ({
+      ...t,
+      img: urlFor(t.img) // Automate Optimization
+    }));
+    const blogs = (sanityData.BLOGS || []).map(b => ({
+      ...b,
+      coverImage: urlFor(b.coverImage), // Automate Optimization
+      // Deep optimize content images
+      content: (b.content || []).map(block => 
+        block._type === 'image' || block.type === 'img' 
+          ? { ...block, url: urlFor(block.url || block) } 
+          : block
+      )
+    }));
+    const banners = (sanityData.BANNERS || []).map(bn => ({
+      ...bn,
+      url: urlFor(bn.url) // Automate Optimization
+    }));
 
     return {
       SITE: sanityData.SITE || staticData.SITE,
