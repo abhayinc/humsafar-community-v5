@@ -58,7 +58,12 @@ export default function HomePage({ tours, blogs, banners, site: freshSite }) {
       (selectedRegion === "all" || t.region === selectedRegion) &&
       (selectedType === "all" || t.type === selectedType)
   );
-  const bestsellers = tours.filter((t) => t.bestseller).slice(0, 4);
+  
+  // Show bestsellers first, but if none are marked, show the latest tours instead
+  const bestsellers = tours.some(t => t.bestseller) 
+    ? tours.filter((t) => t.bestseller).slice(0, 4)
+    : tours.slice(0, 4);
+
   const isDefault = selectedRegion === "all" && selectedType === "all";
 
   // AEO: Homepage FAQs for "People Also Ask"
