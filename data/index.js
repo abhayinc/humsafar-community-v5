@@ -27,7 +27,7 @@ const client = createClient({
 
 export async function getFreshData() {
   try {
-    const data = await client.fetch(`{
+    const sanityData = await client.fetch(`{
       "SITE": *[_type == "siteSettings"][0],
       "TOURS": *[_type == "tour"] {
         ...,
@@ -45,11 +45,13 @@ export async function getFreshData() {
       }
     }`);
 
-    // If Sanity has data, return it. Otherwise, fallback to initial default data.
-    if (data && data.SITE) {
-       return data;
-    }
-    return staticData;
+    // Merge logic: Use Sanity data if it exists, otherwise use staticData
+    return {
+      SITE: sanityData.SITE || staticData.SITE,
+      TOURS: (sanityData.TOURS && sanityData.TOURS.length > 0) ? sanityData.TOURS : staticData.TOURS,
+      BLOGS: (sanityData.BLOGS && sanityData.BLOGS.length > 0) ? sanityData.BLOGS : staticData.BLOGS,
+      BANNERS: (sanityData.BANNERS && sanityData.BANNERS.length > 0) ? sanityData.BANNERS : staticData.BANNERS,
+    };
   } catch (error) {
     console.error("Sanity fetch failed, falling back to static data", error);
     return staticData;
