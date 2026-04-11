@@ -29,12 +29,12 @@ export async function getFreshData() {
   try {
     const sanityData = await client.fetch(`{
       "SITE": *[_type == "siteSettings"][0],
-      "TOURS": *[_type == "tour"] {
+      "TOURS": *[_type == "tour" && defined(slug.current)] {
         ...,
         "slug": slug.current,
         "img": img.asset->url
       },
-      "BLOGS": *[_type == "blog"] {
+      "BLOGS": *[_type == "blog" && defined(slug.current)] {
         ...,
         "slug": slug.current,
         "coverImage": coverImage.asset->url
@@ -46,11 +46,16 @@ export async function getFreshData() {
     }`);
 
     // Merge logic: Use Sanity data if it exists, otherwise use staticData
+    // Ensure TOURS and BLOGS are arrays and only contain items with string slugs
+    const tours = (sanityData.TOURS || []).filter(t => typeof t.slug === 'string');
+    const blogs = (sanityData.BLOGS || []).filter(b => typeof b.slug === 'string');
+    const banners = (sanityData.BANNERS || []).filter(bn => bn.url);
+
     return {
       SITE: sanityData.SITE || staticData.SITE,
-      TOURS: (sanityData.TOURS && sanityData.TOURS.length > 0) ? sanityData.TOURS : staticData.TOURS,
-      BLOGS: (sanityData.BLOGS && sanityData.BLOGS.length > 0) ? sanityData.BLOGS : staticData.BLOGS,
-      BANNERS: (sanityData.BANNERS && sanityData.BANNERS.length > 0) ? sanityData.BANNERS : staticData.BANNERS,
+      TOURS: tours.length > 0 ? tours : staticData.TOURS,
+      BLOGS: blogs.length > 0 ? blogs : staticData.BLOGS,
+      BANNERS: banners.length > 0 ? banners : staticData.BANNERS,
     };
   } catch (error) {
     console.error("Sanity fetch failed, falling back to static data", error);

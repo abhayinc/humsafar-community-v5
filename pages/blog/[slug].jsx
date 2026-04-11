@@ -272,9 +272,11 @@ export default function BlogDetailPage({ blog, relatedBlogs, site: freshSite }) 
 
 export async function getStaticPaths() {
   const data = await getFreshData();
-  const paths = data.BLOGS.map((blog) => ({
-    params: { slug: blog.slug },
-  }));
+  const paths = data.BLOGS
+    .filter((blog) => blog && typeof blog.slug === 'string')
+    .map((blog) => ({
+      params: { slug: blog.slug },
+    }));
   return { paths, fallback: true };
 }
 

@@ -462,9 +462,11 @@ function getNextSaturdays(n = 5) {
 // SSG with ISR for maximum SEO performance
 export async function getStaticPaths() {
   const data = await getFreshData();
-  const paths = data.TOURS.map((tour) => ({
-    params: { slug: tour.slug },
-  }));
+  const paths = data.TOURS
+    .filter((tour) => tour && typeof tour.slug === 'string')
+    .map((tour) => ({
+      params: { slug: tour.slug },
+    }));
   return { paths, fallback: true };
 }
 
