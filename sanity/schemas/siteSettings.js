@@ -1,0 +1,33 @@
+export default {
+  name: 'siteSettings',
+  title: 'Site Settings',
+  type: 'document',
+  fields: [
+    { name: 'name', title: 'Site Name', type: 'string' },
+    { name: 'url', title: 'Site URL', type: 'url' },
+    { name: 'phone', title: 'Phone Number', type: 'string' },
+    { name: 'whatsapp', title: 'WhatsApp Number (Country code + num, e.g. 916268496389)', type: 'string' },
+    { name: 'email', title: 'Email Address', type: 'string' },
+    { name: 'address', title: 'Physical Address', type: 'text' },
+    { name: 'lat', title: 'Latitude', type: 'string' },
+    { name: 'lng', title: 'Longitude', type: 'string' },
+    { name: 'founded', title: 'Year Founded', type: 'string' },
+    { name: 'reviewCount', title: 'Total Review Count', type: 'string' },
+    { name: 'ratingValue', title: 'Average Rating (e.g. 4.8)', type: 'string' },
+    { name: 'totalTravelers', title: 'Total Travelers Served', type: 'string' },
+    { name: 'gst', title: 'GST Number', type: 'string' },
+    { name: 'location', title: 'Base Location', type: 'string' },
+    { name: 'defaultOGImage', title: 'Default SEO Fallback Image', type: 'image', options: { hotspot: true } },
+    {
+      name: 'socials',
+      title: 'Social Media Links',
+      type: 'object',
+      fields: [
+        { name: 'instagram', type: 'url' },
+        { name: 'facebook', type: 'url' },
+        { name: 'youtube', type: 'url' },
+        { name: 'twitter', type: 'url' },
+      ],
+    },
+  ],
+};

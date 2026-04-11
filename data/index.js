@@ -15,32 +15,45 @@ export const BANNERS = data.BANNERS;
  * Server-side only: Reads fresh data directly from disk to bypass Webpack cache.
  * Use this in getStaticProps/getServerSideProps.
  */
-export async function getFreshData() {
-  if (typeof window === 'undefined') {
-    // 1. Try fetching from Vercel KV if available (for production)
-    try {
-      const { kv } = require('@vercel/kv');
-      const kvData = await kv.get('humsafar_cms_data');
-      if (kvData && kvData.SITE) {
-        return kvData;
-      }
-    } catch (e) {
-      console.error("Vercel KV fetch failed (or not configured).", e.message || e);
-    }
+import { createClient } from 'next-sanity';
+import staticData from './data.json';
 
-    // 2. Fallback to local files (for local dev)
-    const fs = require('fs');
-    const path = require('path');
-    try {
-      const filePath = path.join(process.cwd(), 'data', 'data.json');
-      const fileData = fs.readFileSync(filePath, 'utf8');
-      return JSON.parse(fileData);
-    } catch (e) {
-      console.error("Failed to read fresh local data, falling back to static import", e);
-      return data;
+const client = createClient({
+  projectId: 'fghdctku',
+  dataset: 'production',
+  apiVersion: '2024-03-01',
+  useCdn: false, // Ensures we always get fresh CMS data
+});
+
+export async function getFreshData() {
+  try {
+    const data = await client.fetch(`{
+      "SITE": *[_type == "siteSettings"][0],
+      "TOURS": *[_type == "tour"] {
+        ...,
+        "slug": slug.current,
+        "img": img.asset->url
+      },
+      "BLOGS": *[_type == "blog"] {
+        ...,
+        "slug": slug.current,
+        "coverImage": coverImage.asset->url
+      },
+      "BANNERS": *[_type == "banner"] {
+        ...,
+        "url": image.asset->url
+      }
+    }`);
+
+    // If Sanity has data, return it. Otherwise, fallback to initial default data.
+    if (data && data.SITE) {
+       return data;
     }
+    return staticData;
+  } catch (error) {
+    console.error("Sanity fetch failed, falling back to static data", error);
+    return staticData;
   }
-  return data;
 }
 
 export function generateOrganizationSchema(site = SITE) {
