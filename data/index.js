@@ -117,7 +117,7 @@ export function generateOrganizationSchema(site = SITE) {
       bestRating: "5",
       worstRating: "1",
     },
-    sameAs: Object.values(site.socials),
+    sameAs: Object.values(site.socials || {}),
   };
 }
 
@@ -153,7 +153,7 @@ export function generateTourSchema(tour, site = SITE) {
       "@id": `${site.url}/#organization`,
       name: site.name,
     },
-    itinerary: tour.itinerary?.map((day) => ({
+    itinerary: (tour.itinerary || []).map((day) => ({
       "@type": "TouristAttraction",
       name: day.title,
       description: day.desc,
