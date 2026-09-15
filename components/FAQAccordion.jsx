@@ -6,64 +6,41 @@ export default function FAQAccordion({ faqs }) {
 
   return (
     <div itemScope itemType="https://schema.org/FAQPage">
-      {faqs.map((faq, i) => (
-        <div
-          key={i}
-          style={{
-            border: "1px solid #e2e8f0",
-            borderRadius: 13,
-            overflow: "hidden",
-            marginBottom: 10,
-          }}
-          itemScope
-          itemType="https://schema.org/Question"
-          itemProp="mainEntity"
-        >
-          <button
-            onClick={() => setOpen(open === i ? null : i)}
-            aria-expanded={open === i}
-            style={{
-              cursor: "pointer",
-              padding: "18px 22px",
-              fontWeight: 600,
-              fontSize: 15,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              background: "#fff",
-              width: "100%",
-              border: "none",
-              textAlign: "left",
-              fontFamily: "Plus Jakarta Sans, sans-serif",
-              color: "#1e293b",
-              transition: "background 0.15s",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "#f8fafc")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "#fff")}
+      {faqs.map((faq, i) => {
+        const isOpen = open === i;
+        return (
+          <div
+            key={i}
+            className="faq-item"
+            itemScope
+            itemType="https://schema.org/Question"
+            itemProp="mainEntity"
           >
-            <span itemProp="name">{faq.q}</span>
-            <span style={{ marginLeft: 12, flexShrink: 0, fontSize: 18 }}>
-              {open === i ? "−" : "+"}
-            </span>
-          </button>
-          {open === i && (
+            <button
+              className="faq-question"
+              onClick={() => setOpen(isOpen ? null : i)}
+              aria-expanded={isOpen}
+              aria-controls={`faq-${i}`}
+            >
+              <span itemProp="name">{faq.q}</span>
+              <span style={{ marginLeft: 12, flexShrink: 0, fontSize: 18 }}>{isOpen ? '−' : '+'}</span>
+            </button>
+
             <div
-              style={{
-                padding: "4px 22px 18px",
-                fontSize: 14,
-                color: "#475569",
-                lineHeight: 1.75,
-                fontFamily: "Plus Jakarta Sans, sans-serif",
-              }}
+              id={`faq-${i}`}
+              className="faq-answer"
+              role="region"
+              aria-hidden={!isOpen}
+              style={{ display: isOpen ? 'block' : 'none' }}
               itemScope
               itemType="https://schema.org/Answer"
               itemProp="acceptedAnswer"
             >
               <span itemProp="text">{faq.a}</span>
             </div>
-          )}
-        </div>
-      ))}
+          </div>
+        );
+      })}
     </div>
   );
 }
