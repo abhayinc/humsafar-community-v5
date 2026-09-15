@@ -27,8 +27,8 @@ export default function TourDetailPage({ tour, relatedTours, site: freshSite }) 
   // Get next 5 Saturdays
   const saturdays = getNextSaturdays(5);
   useEffect(() => {
-    if (!activeDate && saturdays.length > 0) setActiveDate(saturdays[0]);
-  }, []);
+    if (!activeDate && saturdays.length > 0) setActiveDate(saturdays[0].toISOString());
+  }, [saturdays]);
 
   if (router.isFallback) {
     return (
@@ -50,7 +50,14 @@ export default function TourDetailPage({ tour, relatedTours, site: freshSite }) 
   const pricePerPerson = Number(tour.price) + currentSurcharge;
   const totalPrice = pricePerPerson * pax;
 
-  const waMessage = `Hi Humsafar! I am interested in *${tour.title}*.\n\n🗓 Date: ${activeDate ? new Date(activeDate).toDateString() : "TBD"}\n🏨 Sharing: ${sharing}\n👥 People: ${pax}\n💰 Total: ₹${totalPrice.toLocaleString("en-IN")}\n⏱ Duration: ${tour.duration}\n\nPlease share more details.`;
+  const waMessage = `Hi Humsafar! I am interested in *${tour.title}*.
+
+🗓 Date: ${activeDate ? new Date(activeDate).toDateString() : "TBD"}
+🏨 Sharing: ${sharing}
+👥 People: ${pax}
+💰 Total: ₹${totalPrice.toLocaleString("en-IN")}
+
+Please let me know the next steps to book. Thanks!`;
 
   const schemas = [
     generateOrganizationSchema(dynamicSite),
@@ -63,6 +70,15 @@ export default function TourDetailPage({ tour, relatedTours, site: freshSite }) 
     { name: "Tour Packages", path: "/packages" },
     { name: tour.title, path: `/packages/${tour.slug}` },
   ];
+
+  function handleBack(e) {
+    e.preventDefault();
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push('/packages');
+    }
+  }
 
   return (
     <>
@@ -132,7 +148,7 @@ export default function TourDetailPage({ tour, relatedTours, site: freshSite }) 
           background: "#fff",
           borderTop: "1px solid #e2e8f0",
           padding: "12px 20px 22px",
-          display: "flex",
+          display: "none", // hidden on desktop; shown via CSS on small screens
           alignItems: "center",
           justifyContent: "space-between",
           boxShadow: "0 -8px 32px rgba(0,0,0,0.1)",
@@ -164,7 +180,7 @@ export default function TourDetailPage({ tour, relatedTours, site: freshSite }) 
             gap: 7,
             fontFamily: "Plus Jakarta Sans, sans-serif",
           }}
-          onClick={() => window.gtag?.("event", "whatsapp_click", { event_label: "Mobile Book Bar", value: totalPrice })}
+          onClick={() => window.gtag?.('event', 'whatsapp_click', { event_label: 'Mobile Book Bar', value: totalPrice })}
         >
           💬 Book Now
         </a>
@@ -181,9 +197,27 @@ export default function TourDetailPage({ tour, relatedTours, site: freshSite }) 
           style={{ objectFit: "cover" }}
         />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,0.82),rgba(0,0,0,0.18))" }} />
-        <Link href="/packages" style={{ position: "absolute", top: 88, left: 24, background: "rgba(255,255,255,0.18)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", borderRadius: 999, padding: "9px 20px", cursor: "pointer", fontSize: 13, fontWeight: 600, fontFamily: "Plus Jakarta Sans, sans-serif", textDecoration: "none" }}>
+
+        {/* Back button: uses router.back when available, falls back to packages listing */}
+        <button
+          onClick={handleBack}
+          style={{
+            position: "absolute",
+            top: 24,
+            left: 16,
+            background: "rgba(255,255,255,0.9)",
+            border: "1px solid rgba(0,0,0,0.06)",
+            color: "#064e3b",
+            padding: "8px 12px",
+            borderRadius: 10,
+            cursor: "pointer",
+            fontWeight: 700,
+          }}
+          aria-label="Go back to packages"
+        >
           ← All Packages
-        </Link>
+        </button>
+
         <div style={{ position: "absolute", bottom: 28, left: 24, right: 24, maxWidth: 1060, margin: "0 auto" }}>
           <div style={{ display: "flex", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
             <span style={{ background: "rgba(16,185,129,0.85)", color: "#fff", fontSize: 11, padding: "3px 12px", borderRadius: 6, fontWeight: 700, textTransform: "uppercase", fontFamily: "Plus Jakarta Sans, sans-serif" }}>
@@ -192,11 +226,11 @@ export default function TourDetailPage({ tour, relatedTours, site: freshSite }) 
             <span style={{ background: "rgba(200,134,10,0.9)", color: "#fff", fontSize: 11, padding: "3px 12px", borderRadius: 6, fontWeight: 700, fontFamily: "Plus Jakarta Sans, sans-serif" }}>
               From ₹{Number(tour.price).toLocaleString("en-IN")}
             </span>
-            <span style={{ background: "rgba(255,255,255,0.18)", backdropFilter: "blur(4px)", color: "#fff", fontSize: 11, padding: "3px 12px", borderRadius: 6, border: "1px solid rgba(255,255,255,0.2)", fontFamily: "Plus Jakarta Sans, sans-serif" }}>
+            <span style={{ background: "rgba(255,255,255,0.18)", backdropFilter: "blur(4px)", color: "#fff", fontSize: 11, padding: "3px 12px", borderRadius: 6, border: "1px solid rgba(255,255,255,0.12)", fontFamily: "Plus Jakarta Sans, sans-serif" }}>
               {tour.duration}
             </span>
           </div>
-          <h1 style={{ fontFamily: "Playfair Display, serif", fontSize: "clamp(24px,4vw,50px)", fontWeight: 700, color: "#fff", marginBottom: 10, lineHeight: 1.1, textShadow: "0 4px 20px rgba(0,0,0,0.3)" }}>
+          <h1 style={{ fontFamily: "Playfair Display, serif", fontSize: "clamp(24px,4vw,50px)", fontWeight: 700, color: "#fff", marginBottom: 10, lineHeight: 1.1, textShadow: "0 4px 20px rgba(0,0,0,0.25)" }}>
             {tour.title}
           </h1>
           <div style={{ color: "rgba(255,255,255,0.8)", fontSize: 14, display: "flex", gap: 18, flexWrap: "wrap", fontFamily: "Plus Jakarta Sans, sans-serif" }}>
@@ -220,7 +254,7 @@ export default function TourDetailPage({ tour, relatedTours, site: freshSite }) 
 
       {/* Main content */}
       <main style={{ background: "#f8fafc", minHeight: "100vh", paddingBottom: 100, fontFamily: "Plus Jakarta Sans, sans-serif" }}>
-        <div style={{ maxWidth: 1060, margin: "0 auto", padding: "32px 20px", display: "grid", gridTemplateColumns: "1fr 330px", gap: 28 }}>
+        <div className="page-grid" style={{ maxWidth: 1060, margin: "0 auto", padding: "32px 20px", display: "grid", gridTemplateColumns: "1fr 330px", gap: 28 }}>
           <div>
             {/* Highlights */}
             <section aria-label="Trip highlights" style={{ background: "#fff", borderRadius: 18, padding: "26px 28px", marginBottom: 22, border: "1px solid #e2e8f0" }}>
@@ -228,7 +262,9 @@ export default function TourDetailPage({ tour, relatedTours, site: freshSite }) 
               <ul style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 11, listStyle: "none" }}>
                 {tour.highlights?.map((h, i) => (
                   <li key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <div style={{ width: 22, height: 22, borderRadius: 999, background: "#ecfdf5", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 12 }}>✓</div>
+                    <div style={{ width: 22, height: 22, borderRadius: 999, background: "#ecfdf5", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 12 }}>
+                      ✅
+                    </div>
                     <span style={{ fontSize: 14, color: "#374151", fontWeight: 500 }}>{h}</span>
                   </li>
                 ))}
@@ -246,10 +282,10 @@ export default function TourDetailPage({ tour, relatedTours, site: freshSite }) 
                     <button
                       onClick={() => setExpandedDay(expandedDay === i ? -1 : i)}
                       aria-expanded={expandedDay === i}
-                      style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "17px 22px", background: "none", border: "none", cursor: "pointer", textAlign: "left", fontFamily: "Plus Jakarta Sans, sans-serif" }}
+                      style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "17px 22px", background: "none", border: "none", cursor: "pointer" }}
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: 13 }}>
-                        <div style={{ width: 40, height: 40, borderRadius: 999, background: expandedDay === i ? "#064e3b" : "#ecfdf5", color: expandedDay === i ? "#fff" : "#064e3b", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, flexShrink: 0 }}>
+                        <div style={{ width: 40, height: 40, borderRadius: 999, background: expandedDay === i ? "#064e3b" : "#ecfdf5", color: expandedDay === i ? "#fff" : "#064e3b", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900 }}>
                           D{day.day}
                         </div>
                         <div>
@@ -280,7 +316,7 @@ export default function TourDetailPage({ tour, relatedTours, site: freshSite }) 
                   <ul style={{ listStyle: "none" }}>
                     {sec.items?.map((item, i) => (
                       <li key={i} style={{ display: "flex", gap: 10, marginBottom: 9 }}>
-                        <div style={{ width: 20, height: 20, borderRadius: 999, background: sec.bg, flexShrink: 0, marginTop: 1, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: sec.col }}>
+                        <div style={{ width: 20, height: 20, borderRadius: 999, background: sec.bg, flexShrink: 0, marginTop: 1, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>
                           {sec.icon}
                         </div>
                         <span style={{ fontSize: 13, color: "#475569", lineHeight: 1.5 }}>{item}</span>
@@ -316,7 +352,7 @@ export default function TourDetailPage({ tour, relatedTours, site: freshSite }) 
                     <button
                       onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
                       aria-expanded={expandedFaq === i}
-                      style={{ cursor: "pointer", padding: "18px 22px", fontWeight: 600, fontSize: 15, display: "flex", justifyContent: "space-between", alignItems: "center", background: "#fff", width: "100%", border: "none", textAlign: "left", fontFamily: "Plus Jakarta Sans, sans-serif", color: "#1e293b" }}
+                      style={{ cursor: "pointer", padding: "18px 22px", fontWeight: 600, fontSize: 15, display: "flex", justifyContent: "space-between", alignItems: "center", background: "#fff", border: "none" }}
                     >
                       <span itemProp="name">{faq.q}</span>
                       <span style={{ marginLeft: 12, flexShrink: 0, fontSize: 18 }}>{expandedFaq === i ? "−" : "+"}</span>
@@ -364,7 +400,7 @@ export default function TourDetailPage({ tour, relatedTours, site: freshSite }) 
                       <button
                         key={i}
                         onClick={() => setActiveDate(dateStr)}
-                        style={{ padding: "9px 4px", borderRadius: 10, border: `2px solid ${isActive ? "#064e3b" : "#e2e8f0"}`, background: isActive ? "#ecfdf5" : "#fff", cursor: "pointer", textAlign: "center", fontFamily: "Plus Jakarta Sans, sans-serif", transition: "all 0.15s" }}
+                        style={{ padding: "9px 4px", borderRadius: 10, border: `2px solid ${isActive ? "#064e3b" : "#e2e8f0"}`, background: isActive ? "#ecfdf5" : "#fff", cursor: "pointer", textAlign: "center" }}
                       >
                         <div style={{ fontSize: 9, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1 }}>
                           {d.toLocaleDateString("en-IN", { month: "short" })}
@@ -387,7 +423,7 @@ export default function TourDetailPage({ tour, relatedTours, site: freshSite }) 
                     <button
                       key={o.type}
                       onClick={() => setSharing(o.type)}
-                      style={{ padding: "9px 4px", borderRadius: 10, border: `2px solid ${sharing === o.type ? "#064e3b" : "#e2e8f0"}`, background: sharing === o.type ? "#ecfdf5" : "#fff", cursor: "pointer", textAlign: "center", fontFamily: "Plus Jakarta Sans, sans-serif" }}
+                      style={{ padding: "9px 4px", borderRadius: 10, border: `2px solid ${sharing === o.type ? "#064e3b" : "#e2e8f0"}`, background: sharing === o.type ? "#ecfdf5" : "#fff", cursor: "pointer", textAlign: "center" }}
                     >
                       <div style={{ fontSize: 12, fontWeight: 700, color: "#0e1117" }}>{o.type}</div>
                       <div style={{ fontSize: 10, color: "#94a3b8" }}>
@@ -402,17 +438,17 @@ export default function TourDetailPage({ tour, relatedTours, site: freshSite }) 
                   Number of Travelers
                 </div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#f8fafc", borderRadius: 12, padding: "10px 14px", marginBottom: 18, border: "1px solid #e2e8f0" }}>
-                  <button onClick={() => setPax(Math.max(1, pax - 1))} style={{ width: 34, height: 34, borderRadius: 10, background: "#fff", border: "1px solid #e2e8f0", cursor: "pointer", fontSize: 20, display: "flex", alignItems: "center", justifyContent: "center" }}>−</button>
+                  <button onClick={() => setPax(Math.max(1, pax - 1))} style={{ width: 34, height: 34, borderRadius: 10, background: "#fff", border: "1px solid #e2e8f0", cursor: "pointer", fontSize: 20 }}>−</button>
                   <span style={{ fontSize: 24, fontWeight: 900, fontFamily: "Playfair Display, serif" }}>{pax}</span>
-                  <button onClick={() => setPax(pax + 1)} style={{ width: 34, height: 34, borderRadius: 10, background: "#fff", border: "1px solid #e2e8f0", cursor: "pointer", fontSize: 20, display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
+                  <button onClick={() => setPax(pax + 1)} style={{ width: 34, height: 34, borderRadius: 10, background: "#fff", border: "1px solid #e2e8f0", cursor: "pointer", fontSize: 20 }}>+</button>
                 </div>
 
                 <a
                   href={`https://wa.me/${dynamicSite.whatsapp}?text=${encodeURIComponent(waMessage)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", background: "#22c55e", color: "#fff", padding: "15px", borderRadius: 14, fontWeight: 800, fontSize: 14, textDecoration: "none", boxSizing: "border-box", fontFamily: "Plus Jakarta Sans, sans-serif" }}
-                  onClick={() => window.gtag?.("event", "whatsapp_click", { event_label: "Tour Sidebar", value: totalPrice })}
+                  style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", background: "#22c55e", color: "#fff", padding: "15px", borderRadius: 14, fontWeight: 800, textDecoration: "none" }}
+                  onClick={() => window.gtag?.('event', 'whatsapp_click', { event_label: 'Tour Sidebar', value: totalPrice })}
                 >
                   💬 Book on WhatsApp
                 </a>
@@ -443,7 +479,7 @@ export default function TourDetailPage({ tour, relatedTours, site: freshSite }) 
       <style jsx>{`
         @media (max-width: 768px) {
           .mobile-book-bar { display: flex !important; }
-          main > div { grid-template-columns: 1fr !important; }
+          .page-grid { grid-template-columns: 1fr !important; }
           aside { display: none !important; }
         }
       `}</style>
@@ -454,7 +490,9 @@ export default function TourDetailPage({ tour, relatedTours, site: freshSite }) 
 function getNextSaturdays(n = 5) {
   const dates = [];
   let d = new Date();
-  d.setDate(d.getDate() + ((6 - d.getDay() + 7) % 7 || 7));
+  // Advance to next Saturday (6). If today is Saturday, include today.
+  const daysUntilSat = (6 - d.getDay() + 7) % 7;
+  d.setDate(d.getDate() + daysUntilSat);
   for (let i = 0; i < n; i++) {
     dates.push(new Date(d));
     d.setDate(d.getDate() + 7);
